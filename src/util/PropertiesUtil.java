@@ -1,4 +1,4 @@
-package com.dmdev.jdbc.starter.util;
+package util;
 
 import java.io.IOException;
 import java.io.InputStream;
