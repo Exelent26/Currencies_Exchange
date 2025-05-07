@@ -59,9 +59,9 @@ public class CurrencyDao implements CrudDao<Currency> {
 
         } catch (SQLException e) {
             if (e.getErrorCode() == 19) {
-                throw new DaoException("This currency already exist", DaoException.ErrorCode.DUPLICATE_CURRENCY, e);
+                throw new DaoException("This currency already exist", DaoException.ErrorCode.DUPLICATE_CURRENCY);
             } else {
-                throw new DaoException("Cant connect to database", DaoException.ErrorCode.DATABASE_ERROR, e);
+                throw new DaoException("Cant connect to database", DaoException.ErrorCode.DATABASE_ERROR);
             }
         }
 
@@ -79,7 +79,7 @@ public class CurrencyDao implements CrudDao<Currency> {
                     : Optional.empty();
 
         } catch (SQLException e) {
-            throw new DaoException("Database error", DaoException.ErrorCode.DATABASE_ERROR, e);
+            throw new DaoException("Database error", DaoException.ErrorCode.DATABASE_ERROR);
         }
     }
     public Optional<Currency> findByCode(String code) {
@@ -87,13 +87,12 @@ public class CurrencyDao implements CrudDao<Currency> {
              var prepareStatement = connection.prepareStatement(GET_CURRENCY_BY_CODE);) {
             prepareStatement.setString(1, code);
             var resultSet = prepareStatement.executeQuery();
-            Currency currency = null;
             return resultSet.next()
                     ? Optional.of(buildCurrency(resultSet))
                     : Optional.empty();
 
         } catch (SQLException e) {
-            throw new DaoException("Database error", DaoException.ErrorCode.DATABASE_ERROR, e);
+            throw new DaoException("Database error", DaoException.ErrorCode.DATABASE_ERROR);
         }
     }
 

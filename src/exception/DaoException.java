@@ -5,7 +5,10 @@ public class DaoException extends RuntimeException {
     public enum ErrorCode {
         DUPLICATE_CURRENCY,
         CURRENCY_NOT_FOUND,
-        DATABASE_ERROR
+        DATABASE_ERROR,
+        DUPLICATE_EXCHANGE_RATE,
+        INVALID_INPUT,
+        EXCHANGE_RATE_NOT_FOUND
         }
 
     private ErrorCode errorCode;

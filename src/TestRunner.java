@@ -1,8 +1,9 @@
 import dao.CurrencyDao;
 import dao.ExchangeRateDao;
 import dto.CurrenciesPair;
-import entity.Currency;
+import entity.ExchangeRate;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 public class TestRunner {
@@ -24,8 +25,13 @@ public class TestRunner {
         System.out.println(instance.findById(2));
         System.out.println(instance.findByCode("RUB"));*/
         ExchangeRateDao dao = ExchangeRateDao.getInstance();
-        dao.findAll().forEach(System.out::println);
         CurrenciesPair pair = new CurrenciesPair("USD", "EUR");
+        //System.out.println(dao.findRateByCode(pair));
+        //dao.findAll().forEach(System.out::println);
+
+        //var usdrub = dao.save(new CurrenciesPair("USD","RUB"),new BigDecimal("0.65"));
+            dao.updateExchangeRate(1, BigDecimal.valueOf(0.02));
+
     }
     }
 
