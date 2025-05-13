@@ -88,7 +88,7 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
             var resultSet = prepareStatement.executeQuery();
             return resultSet.next() ? Optional.of(buildCurrencyPairRate(resultSet)) : Optional.empty();
         } catch (SQLException e) {
-            throw new DaoException("Cannot get currencies pair rate from database");
+            throw new DaoException("Cannot get currencies pair rate from database", DaoException.ErrorCode.DATABASE_ERROR);
         }
     }
     public ExchangeRate updateExchangeRate(int exchangeRateId, BigDecimal newRate) {
