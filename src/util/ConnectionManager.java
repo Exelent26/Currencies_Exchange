@@ -13,6 +13,7 @@ public class ConnectionManager {
     private static final String URL_KEY = "db.url";
     private static final Integer DEFAULT_POOL_SIZE = 10;
     private static final String POOL_SIZE_KEY = "db.pool.size";
+    private static final String DRIVER_KEY = "db.driver";
     private static BlockingQueue<Connection> pool;
     private static List<Connection> sourceConnections;
 
@@ -26,7 +27,7 @@ public class ConnectionManager {
 
     private static void loadDriver() {
         try {
-            Class.forName("org.sqlite.JDBC");
+            Class.forName(PropertiesUtil.get(DRIVER_KEY));
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
