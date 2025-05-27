@@ -20,17 +20,17 @@ public class TestRunner {
         instance.save(currency);
         System.out.println(instance);*/
 
-        //instance.findAll().forEach(System.out::println);
+        instance.findAll().forEach(System.out::println);
        /* instance.findById(2);
         System.out.println(instance.findById(2));
         System.out.println(instance.findByCode("RUB"));*/
-        ExchangeRateDao dao = ExchangeRateDao.getInstance();
-        CurrenciesPair pair = new CurrenciesPair("USD", "EUR");
+        //ExchangeRateDao dao = ExchangeRateDao.getInstance();
+        //CurrenciesPair pair = new CurrenciesPair("USD", "EUR");
         //System.out.println(dao.findRateByCode(pair));
         //dao.findAll().forEach(System.out::println);
 
         //var usdrub = dao.save(new CurrenciesPair("USD","RUB"),new BigDecimal("0.65"));
-            dao.updateExchangeRate(1, BigDecimal.valueOf(0.02));
+            //dao.updateExchangeRate(1, BigDecimal.valueOf(0.02));
 
     }
     }

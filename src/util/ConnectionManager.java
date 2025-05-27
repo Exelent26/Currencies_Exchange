@@ -17,6 +17,7 @@ public class ConnectionManager {
     private static BlockingQueue<Connection> pool;
     private static List<Connection> sourceConnections;
 
+
     static {
         loadDriver();
         initConnectionPool();
@@ -35,8 +36,11 @@ public class ConnectionManager {
 
     private static Connection open() {
         try {
-            return DriverManager.getConnection(
-                    PropertiesUtil.get(URL_KEY));
+            var resourceUrl = ConnectionManager.class.getClassLoader().getResource("CurrencyExchange.db");
+            if (resourceUrl == null) {
+                throw new RuntimeException("Database file not found in classpath.");
+            }
+            return DriverManager.getConnection("jdbc:sqlite:" + resourceUrl.getPath());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
