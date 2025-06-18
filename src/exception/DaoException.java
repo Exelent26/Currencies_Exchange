@@ -8,7 +8,8 @@ public class DaoException extends RuntimeException {
         DATABASE_ERROR,
         DUPLICATE_EXCHANGE_RATE,
         INVALID_INPUT,
-        EXCHANGE_RATE_NOT_FOUND
+        EXCHANGE_RATE_NOT_FOUND,
+        DB_CONSTRAINT_ERROR,
         }
 
     private ErrorCode errorCode;

@@ -19,4 +19,10 @@ public record CurrenciesPair(
             throw new IllegalArgumentException("Invalid currency code: " + code);
         }
     }
+
+
+    public static CurrenciesPair createCurrencyPairFromPath(String path) {
+        return new CurrenciesPair(path.substring(1,4),path.substring(4,7));
+    }
+
 }

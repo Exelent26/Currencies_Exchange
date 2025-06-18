@@ -2,6 +2,7 @@ package dao;
 
 import entity.Currency;
 import exception.DaoException;
+import exception.ServiceException;
 import util.ConnectionManager;
 
 import java.sql.*;
@@ -59,12 +60,13 @@ public class CurrencyDao implements CrudDao<Currency> {
 
         } catch (SQLException e) {
             if (e.getErrorCode() == 19) {
-                throw new DaoException("This currency already exist", DaoException.ErrorCode.DUPLICATE_CURRENCY);
+                throw new DaoException("Database constraint  error ", DaoException.ErrorCode.DB_CONSTRAINT_ERROR);
             } else {
-                throw new DaoException("Cant connect to database", DaoException.ErrorCode.DATABASE_ERROR);
-            }
-        }
+                throw new DaoException("Database Error", DaoException.ErrorCode.DATABASE_ERROR);
 
+            }
+
+        }
     }
 
     @Override
