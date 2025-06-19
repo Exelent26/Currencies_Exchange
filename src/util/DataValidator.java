@@ -61,7 +61,6 @@ public class DataValidator {
     public boolean nullAndBlankCheck(String... strings) {
         for (String string : strings) {
             if (string == null || string.isBlank()) {
-
                 return true;
             }
         }
