@@ -1,6 +1,5 @@
 package dao;
 
-import dto.CurrenciesPair;
 import entity.Currency;
 import entity.ExchangeRate;
 import exception.DaoException;
@@ -80,17 +79,19 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
         }
     }
 
-    public Optional<ExchangeRate> findRateByCode(CurrenciesPair currenciesPair) {
+    public Optional<ExchangeRate> findRateByCode(String baseCode, String targetCode) {
         try (Connection connection = ConnectionManager.get();
              var prepareStatement = connection.prepareStatement(GET_EXCHANGE_RATE_BY_CODE)) {
-            prepareStatement.setString(1, currenciesPair.baseCode());
-            prepareStatement.setString(2, currenciesPair.targetCode());
+            prepareStatement.setString(1, baseCode);
+            prepareStatement.setString(2, targetCode);
             var resultSet = prepareStatement.executeQuery();
             return resultSet.next() ? Optional.of(buildCurrencyPairRate(resultSet)) : Optional.empty();
         } catch (SQLException e) {
             throw new DaoException("Cannot get currencies pair rate from database", DaoException.ErrorCode.DATABASE_ERROR);
         }
     }
+
+
     public ExchangeRate updateExchangeRate(int exchangeRateId, BigDecimal newRate) {
         try (var connection = ConnectionManager.get();
         var prepareStatement = connection.prepareStatement(UPDATE_EXCHANGE_RATE)) {
@@ -111,23 +112,24 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
         }
     }
 
-    public ExchangeRate save(CurrenciesPair currenciesPair, BigDecimal rate) {
-        if (currenciesPair == null || rate == null) {
-            throw new DaoException("Invalid input: currenciesPair or rate is null", DaoException.ErrorCode.INVALID_INPUT);
+
+    public ExchangeRate save(String baseCode, String targetCode, BigDecimal rate) {
+        if (baseCode == null || rate == null|| targetCode == null) {
+            throw new DaoException("Invalid input: baseCode or targetCode  or rate is null", DaoException.ErrorCode.INVALID_INPUT);
         }
-        if (this.findRateByCode(currenciesPair).isEmpty()) {
+        if (this.findRateByCode(baseCode, targetCode).isEmpty()) {
             try (Connection connection = ConnectionManager.get();
                  var prepareStatement = connection.prepareStatement(SAVE_EXCHANGE_RATE, Statement.RETURN_GENERATED_KEYS)) {
 
                 try {
                     connection.setAutoCommit(false);
                     CurrencyDao currencyDao = CurrencyDao.getInstance();
-                    Currency base = currencyDao.findByCode(currenciesPair.baseCode()).orElseThrow(() -> new DaoException(
-                            "Base currency not found: " + currenciesPair.baseCode(),
+                    Currency base = currencyDao.findByCode(baseCode).orElseThrow(() -> new DaoException(
+                            "Base currency not found: " + baseCode,
                             DaoException.ErrorCode.CURRENCY_NOT_FOUND
                     ));
-                    Currency target = currencyDao.findByCode(currenciesPair.targetCode()).orElseThrow(() -> new DaoException(
-                            "Target currency not found: " + currenciesPair.targetCode(),
+                    Currency target = currencyDao.findByCode(targetCode).orElseThrow(() -> new DaoException(
+                            "Target currency not found: " + targetCode,
                             DaoException.ErrorCode.CURRENCY_NOT_FOUND
                     ));
 
@@ -189,7 +191,7 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
             throw new DaoException("Invalid ExchangeRate entity", DaoException.ErrorCode.INVALID_INPUT);
         }
         return save(
-                new CurrenciesPair(entity.getBaseCurrency().getCode(), entity.getTargetCurrency().getCode()),
+                entity.getBaseCurrency().getCode(), entity.getTargetCurrency().getCode(),
                 entity.getRate()
         );
     }

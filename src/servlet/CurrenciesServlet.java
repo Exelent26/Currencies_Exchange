@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.CurrencyService;
+import util.DataValidator;
 
 import java.io.IOException;
 import java.util.Map;
@@ -50,7 +51,8 @@ public class CurrenciesServlet extends HttpServlet {
         String code = req.getParameter("code");
         String sign = req.getParameter("sign");
 
-        if (name == null || code == null || sign == null || name.isBlank() || code.isBlank() || sign.isBlank()) {
+        DataValidator dataValidator = DataValidator.getInstance();
+        if (dataValidator.nullAndBlankCheck(name, code, sign)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             try (var writer = resp.getWriter()) {
                 writer.write(gson.toJson(Map.of("error", "Missing required fields")));

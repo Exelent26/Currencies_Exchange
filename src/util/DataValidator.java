@@ -2,6 +2,7 @@ package util;
 
 import entity.Currency;
 import exception.ServiceException;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class DataValidator {
 
@@ -33,23 +34,37 @@ public class DataValidator {
         }
     }
 
-    private static void validateCurrencyCode(String currencyCode) {
-        if (currencyCode.length() != 3) {
-            throw new ServiceException("INVALID CODE", ServiceException.ErrorCode.VALIDATION_ERROR);
-        }
+    public static void validateCurrencyCode(String... currencyCodes) {
+        for (String currencyCode : currencyCodes) {
+            if (currencyCode.length() != 3) {
+                throw new ServiceException("INVALID CODE", ServiceException.ErrorCode.VALIDATION_ERROR);
+            }
+            if (currencyCode.isBlank()) {
+                throw new ServiceException("Currency code is blank", ServiceException.ErrorCode.VALIDATION_ERROR);
+            }
 
-        if (!(currencyCode.toUpperCase().matches("[A-Z]{3}"))) {
-            throw new ServiceException("INVALID CODE", ServiceException.ErrorCode.VALIDATION_ERROR);
-        }
-        try {
-            java.util.Currency.getInstance(currencyCode);
-        } catch (IllegalArgumentException e) {
-            throw new ServiceException("Currency code is not valid", ServiceException.ErrorCode.VALIDATION_ERROR);
+            if (!(currencyCode.toUpperCase().matches("[A-Z]{3}"))) {
+                throw new ServiceException("INVALID CODE", ServiceException.ErrorCode.VALIDATION_ERROR);
+            }
+            try {
+                java.util.Currency.getInstance(currencyCode);
+            } catch (IllegalArgumentException e) {
+                throw new ServiceException("Currency code is not valid", ServiceException.ErrorCode.VALIDATION_ERROR);
+            }
         }
     }
 
     public boolean validatePath(String path) {
         return path != null && path.startsWith("/") && (path.length() == 7);
+    }
+
+    public boolean nullAndBlankCheck(String... strings) {
+        for (String string : strings) {
+            if (string == null || string.isBlank()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

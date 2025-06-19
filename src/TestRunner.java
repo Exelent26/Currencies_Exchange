@@ -1,9 +1,5 @@
 import dao.CurrencyDao;
-import dao.ExchangeRateDao;
-import dto.CurrenciesPair;
-import entity.ExchangeRate;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 
 public class TestRunner {

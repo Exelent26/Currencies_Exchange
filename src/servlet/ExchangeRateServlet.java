@@ -1,8 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import dto.CurrenciesPair;
-import dto.ExchangeRateDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,8 +11,6 @@ import util.DataValidator;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Optional;
-
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
@@ -24,42 +20,38 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-       try {
+        try {
 
-           String path = request.getPathInfo();
-           if (dataValidator.validatePath(path)) {
-
-
-              /* String baseCurrency = path.substring(1, 4);
-               String targetCurrency = path.substring(4, 7);*/
-
-               CurrenciesPair currenciesPairFromPath = CurrenciesPair.createCurrencyPairFromPath(path);
-
-               var exchangeRateByCode = exchangeRateService.getExchangeRateByCode(currenciesPairFromPath.baseCode(), currenciesPairFromPath.targetCode());
-               if (exchangeRateByCode.isEmpty()) {
-                   response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-               } else {
-                   response.setContentType("application/json; charset=UTF-8");
-                   response.setCharacterEncoding("UTF-8");
-                   response.setStatus(HttpServletResponse.SC_OK);
-                   var json = gson.toJson(exchangeRateByCode);
-                   try (PrintWriter printWriter = response.getWriter()) {
-                       printWriter.write(json);
-                   }
-               }
-           } else {
-               response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-           }
-       }catch(Exception e){
-               response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-           }
+            String path = request.getPathInfo();
+            if (dataValidator.validatePath(path)) {
 
 
+                String baseCurrencyCode = path.substring(1, 4);
+                String targetCurrencyCode = path.substring(4, 7);
+
+                if (dataValidator.nullAndBlankCheck(baseCurrencyCode, targetCurrencyCode)) {
 
 
+                    var exchangeRateByCode = exchangeRateService.getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
+                    if (exchangeRateByCode.isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    } else {
+                        response.setContentType("application/json; charset=UTF-8");
+                        response.setCharacterEncoding("UTF-8");
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        var json = gson.toJson(exchangeRateByCode);
+                        try (PrintWriter printWriter = response.getWriter()) {
+                            printWriter.write(json);
+                        }
+                    }
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
 
     }
-
-
 
 }
