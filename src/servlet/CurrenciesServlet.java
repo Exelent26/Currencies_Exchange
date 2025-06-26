@@ -1,8 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import entity.Currency;
-import exception.DaoException;
 import exception.ServiceException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,8 +12,6 @@ import util.DataValidator;
 
 import java.io.IOException;
 import java.util.Map;
-
-import static exception.ServiceException.ErrorCode.VALIDATION_ERROR;
 
 
 @WebServlet("/currencies")
@@ -52,7 +48,7 @@ public class CurrenciesServlet extends HttpServlet {
         String sign = req.getParameter("sign");
 
         DataValidator dataValidator = DataValidator.getInstance();
-        if (dataValidator.nullAndBlankCheck(name, code, sign)) {
+        if (dataValidator.checkNullAndBlank(name, code, sign)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             try (var writer = resp.getWriter()) {
                 writer.write(gson.toJson(Map.of("error", "Missing required fields")));

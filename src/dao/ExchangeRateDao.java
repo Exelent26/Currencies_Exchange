@@ -6,10 +6,7 @@ import exception.DaoException;
 import util.ConnectionManager;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,14 +51,22 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
             WHERE id = ?
             """;
 
+    private static final String GET_EXCHANGE_RATE_BY_ID = """
+            SELECT er.id,
+                   er.Rate,
+                   bc.id bc_id, bc.code bc_code, bc.full_name bc_fullname, bc.sign bc_sign,
+                   tc.id tc_id, tc.code tc_code, tc.full_name tc_fullname, tc.sign tc_sign
+            FROM ExchangeRates er
+            left join main.Currencies bc on bc.id = er.BaseCurrencyId
+            left join main.Currencies tc on tc.id = er.TargetCurrencyId
+            where er.id = ?
+            """;
+
     public static ExchangeRateDao getInstance() {
         return INSTANCE;
     }
 
-    @Override
-    public Optional<ExchangeRate> findById(int id) {
-        return Optional.empty();
-    }
+
 
     @Override
     public List<ExchangeRate> findAll() {
@@ -89,6 +94,18 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
         } catch (SQLException e) {
             throw new DaoException("Cannot get currencies pair rate from database", DaoException.ErrorCode.DATABASE_ERROR);
         }
+    }
+    @Override
+    public Optional<ExchangeRate> findById(int exchangeRateId) {
+        try(Connection connection = ConnectionManager.get();
+            PreparedStatement preparedStatement = connection.prepareStatement(GET_EXCHANGE_RATE_BY_ID)){
+            preparedStatement.setInt(1, exchangeRateId);
+            var resultSet = preparedStatement.executeQuery();
+            return resultSet.next() ? Optional.of(buildCurrencyPairRate(resultSet)) : Optional.empty();
+        }catch (SQLException e) {
+            throw new DaoException("Cannot get currencies pair rate from database", DaoException.ErrorCode.DATABASE_ERROR);
+        }
+
     }
 
 

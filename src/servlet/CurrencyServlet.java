@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.CurrencyService;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import static java.nio.charset.StandardCharsets.*;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
@@ -37,7 +40,7 @@ public class CurrencyServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             } else {
                 resp.setContentType("application/json; charset=UTF-8");
-                resp.setCharacterEncoding("UTF-8");
+                resp.setCharacterEncoding(UTF_8.name());
                 resp.setStatus(HttpServletResponse.SC_OK);
                 var json = gson.toJson(currencyByCode);
                 printWriter.write(json);
