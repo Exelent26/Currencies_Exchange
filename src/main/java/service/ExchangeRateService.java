@@ -8,7 +8,6 @@ import entity.Currency;
 import entity.ExchangeRate;
 import exception.DaoException;
 import exception.ServiceException;
-import jakarta.servlet.http.HttpServletResponse;
 import mapper.CurrencyMapper;
 import util.DataValidator;
 
