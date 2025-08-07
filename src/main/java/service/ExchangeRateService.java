@@ -8,6 +8,7 @@ import entity.Currency;
 import entity.ExchangeRate;
 import exception.DaoException;
 import exception.ServiceException;
+import jakarta.servlet.http.HttpServletResponse;
 import mapper.CurrencyMapper;
 import util.DataValidator;
 
@@ -69,6 +70,9 @@ public class ExchangeRateService {
         }
 
         BigDecimal rate = this.getRateFromString(rateString);
+        if(!dataValidator.isRatePositive(rate)) {
+            throw new ServiceException("Rate is negative", ServiceException.ErrorCode.VALIDATION_ERROR);
+        }
 
 
         CurrencyService currencyService = CurrencyService.getInstance();
