@@ -13,6 +13,6 @@ public class CurrencyMapper implements Mapper<Currency, CurrencyDto> {
 
     @Override
     public Currency toEntity(CurrencyDto dto) {
-        return new Currency(dto.id(), dto.code(), dto.fullName(), dto.sign());
+        return new Currency(dto.id(), dto.code(), dto.name(), dto.sign());
     }
 }

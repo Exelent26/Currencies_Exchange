@@ -16,25 +16,37 @@ public class DataValidator {
     }
 
     public Currency validateCurrencyData(String currencyCode, String name, String sign) {
-        validateCurrencyCode(currencyCode);
+        validateCurrencyCode(currencyCode.trim());
 
-        validateCurrencyName(name);
+        name = validateCurrencyName(name);
 
-        validateCurrencySign(sign);
+        sign = validateCurrencySign(sign);
 
         return new Currency(currencyCode, name, sign);
     }
 
-    private static void validateCurrencySign(String sign) {
+    private static String validateCurrencySign(String sign) {
         if (sign.length() > 32) {
             throw new ServiceException("SIGN TOO LONG", ServiceException.ErrorCode.VALIDATION_ERROR);
         }
+        return sign.trim();
     }
 
-    private static void validateCurrencyName(String name) {
+    private static String validateCurrencyName(String name) {
+
+        name = name.trim();
+
+
         if (name.length() > 50) {
             throw new ServiceException("FullName TOO LONG", ServiceException.ErrorCode.VALIDATION_ERROR);
         }
+        if(Character.isDigit(name.charAt(0))) {
+            throw new ServiceException("Name starts from digit", ServiceException.ErrorCode.VALIDATION_ERROR);
+
+        }
+
+
+        return name;
     }
     public boolean isRatePositive(BigDecimal rate) {
 
@@ -103,8 +115,6 @@ public class DataValidator {
         }
         return false;
     }
-
-
 
 
 }

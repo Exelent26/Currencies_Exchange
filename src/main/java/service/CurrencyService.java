@@ -50,6 +50,7 @@ public class CurrencyService {
 
     public Currency createCurrency(String code, String name, String sign) {
 
+
         if (validator.isNullOrBlank(name, code, sign)) {
             throw new ServiceException("Can't save currency", ServiceException.ErrorCode.VALIDATION_ERROR);
         }

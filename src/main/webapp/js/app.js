@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    const host = "http://localhost:8080/"
+    const host = "http://192.168.31.205:8080"
 
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {

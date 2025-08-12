@@ -69,6 +69,7 @@ public class ExchangeRateService {
         }
 
         BigDecimal rate = this.getRateFromString(rateString);
+
         if(!dataValidator.isRatePositive(rate)) {
             throw new ServiceException("Rate is negative", ServiceException.ErrorCode.VALIDATION_ERROR);
         }
@@ -116,7 +117,7 @@ public class ExchangeRateService {
 
     public BigDecimal getRateFromString(String rateString) {
         try {
-            return new BigDecimal(rateString);
+            return new BigDecimal(rateString.trim());
         } catch (NumberFormatException e) {
             throw new ServiceException("Bad rateString", ServiceException.ErrorCode.VALIDATION_ERROR);
         }
