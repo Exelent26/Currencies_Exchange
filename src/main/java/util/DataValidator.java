@@ -9,7 +9,7 @@ public class DataValidator {
 
     private static final DataValidator INSTANCE = new DataValidator();
 
-    public DataValidator() {};
+    public DataValidator() {}
 
     public static DataValidator getInstance() {
         return INSTANCE;
@@ -25,33 +25,8 @@ public class DataValidator {
         return new Currency(currencyCode, name, sign);
     }
 
-    private static String validateCurrencySign(String sign) {
-        if (sign.length() > 32) {
-            throw new ServiceException("SIGN TOO LONG", ServiceException.ErrorCode.VALIDATION_ERROR);
-        }
-        return sign.trim();
-    }
-
-    private static String validateCurrencyName(String name) {
-
-        name = name.trim();
-
-
-        if (name.length() > 50) {
-            throw new ServiceException("FullName TOO LONG", ServiceException.ErrorCode.VALIDATION_ERROR);
-        }
-        if(Character.isDigit(name.charAt(0))) {
-            throw new ServiceException("Name starts from digit", ServiceException.ErrorCode.VALIDATION_ERROR);
-
-        }
-
-
-        return name;
-    }
-    public boolean isRatePositive(BigDecimal rate) {
-
-        return rate.compareTo(BigDecimal.ZERO) > 0;
-
+    public boolean isNegativeOrZero(BigDecimal rate) {
+        return rate.compareTo(BigDecimal.ZERO) <= 0;
     }
 
     public static void validateCurrencyCode(String... currencyCodes) {
@@ -73,6 +48,7 @@ public class DataValidator {
             }
         }
     }
+
     public boolean isAmountValid(String amountString) {
          if(this.isNullOrBlank(amountString)){
              return false;
@@ -84,17 +60,33 @@ public class DataValidator {
             return false;
         }
     }
-
-    public boolean isExchangeRatePathInvalid(String path) {
+    public boolean isExchangeRatePathIncorrect(String path) {
         return isPathNullOrBlank(path) || (path.length() != 7) || isPathHasIncorrectStart(path);
+    }
+
+    private static String validateCurrencySign(String sign) {
+        if (sign.length() > 32) {
+            throw new ServiceException("SIGN TOO LONG", ServiceException.ErrorCode.VALIDATION_ERROR);
+        }
+        return sign.trim();
+    }
+
+    private static String validateCurrencyName(String name) {
+
+        name = name.trim();
+
+        if (name.length() > 50) {
+            throw new ServiceException("FullName TOO LONG", ServiceException.ErrorCode.VALIDATION_ERROR);
+        }
+        if(Character.isDigit(name.charAt(0))) {
+            throw new ServiceException("Name starts from digit", ServiceException.ErrorCode.VALIDATION_ERROR);
+        }
+
+        return name;
     }
 
     public boolean isCurrencyPathInvalid(String path) {
         return isPathNullOrBlank(path) || (path.length() != 4) || isPathHasIncorrectStart(path);
-    }
-
-    private static boolean isPathInvalid(String path) {
-        return path == null || !path.startsWith("/");
     }
 
     private  static boolean isPathNullOrBlank(String path) {

@@ -14,6 +14,6 @@ public class ExchangeRateMapper implements Mapper<ExchangeRate, ExchangeRateDto>
 
     @Override
     public ExchangeRate toEntity(ExchangeRateDto dto) {
-        return new ExchangeRate(dto.getId(), dto.getBaseCurrency(), dto.getTargetCurrency(), dto.getRate());
+        return new ExchangeRate(dto.id(), dto.baseCurrency(), dto.targetCurrency(), dto.rate());
     }
 }

@@ -3,7 +3,6 @@ package servlet;
 import com.google.gson.Gson;
 import dto.ExchangeDto;
 import exception.ServiceException;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +15,7 @@ import java.io.PrintWriter;
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         Gson gson = new Gson();
 

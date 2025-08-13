@@ -18,9 +18,6 @@ public class DaoException extends RuntimeException {
         super(message);
     }
 
-    public DaoException(Throwable throwable) {
-        super(throwable);
-    }
 
     public DaoException(String message, Throwable cause) {
         super(message, cause);
@@ -36,7 +33,4 @@ public class DaoException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
 }

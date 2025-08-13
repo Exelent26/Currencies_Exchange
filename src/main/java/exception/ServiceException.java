@@ -22,16 +22,13 @@ public class ServiceException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
+
 
     public int getHttpStatusCode() {
         return switch (errorCode) {
             case VALIDATION_ERROR -> 400;
             case DUPLICATE_ENTITY -> 409;
             case NOT_FOUND -> 404;
-            case DAO_ERROR, DATABASE_ERROR -> 500;
             default -> 500;
         };
     }

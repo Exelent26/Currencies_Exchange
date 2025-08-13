@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import dto.ExchangeRateDto;
 import entity.ExchangeRate;
 import exception.ServiceException;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,9 +20,8 @@ import java.util.Optional;
 public class ExchangeRatesServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService = ExchangeRateService.getInstance();
     Gson gson = new Gson();
-// отрефачил
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)  {
         try {
             var exchangeRates = exchangeRateService.getExchangeRates();
 
@@ -45,8 +43,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//Отрефачил
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws  IOException {
         String baseCurrencyCode = request.getParameter("baseCurrencyCode");
         String targetCurrencyCode = request.getParameter("targetCurrencyCode");
         String rateString = request.getParameter("rate");
@@ -61,7 +58,6 @@ public class ExchangeRatesServlet extends HttpServlet {
 
             ExchangeRate exchangeRate = exchangeRateService.createNewExchangeRate(baseCurrencyCode, targetCurrencyCode, rateString);
             response.setStatus(HttpServletResponse.SC_CREATED);
-
 
             try (PrintWriter writer = response.getWriter()) {
                 writer.write(gson.toJson(exchangeRate));

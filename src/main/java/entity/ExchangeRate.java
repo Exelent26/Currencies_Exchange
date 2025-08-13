@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class ExchangeRate {
     private Integer id;
-    private Currency baseCurrency;
-    private Currency targetCurrency;
+    private final Currency baseCurrency;
+    private final Currency targetCurrency;
     private BigDecimal rate;
 
     public ExchangeRate(Integer id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
@@ -31,17 +31,12 @@ public class ExchangeRate {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(Currency baseCurrency) {
-        this.baseCurrency = baseCurrency;
-    }
+
 
     public Currency getTargetCurrency() {
         return targetCurrency;
     }
 
-    public void setTargetCurrency(Currency targetCurrency) {
-        this.targetCurrency = targetCurrency;
-    }
 
     public BigDecimal getRate() {
         return rate;

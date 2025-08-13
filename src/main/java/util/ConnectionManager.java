@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import util.PropertiesUtil;
 
 public class ConnectionManager {
     private static final String URL_KEY = "db.url";
@@ -27,29 +26,27 @@ public class ConnectionManager {
     private ConnectionManager() {
     }
 
-    private static void loadDriver() {
-        try {
-            Class.forName(PropertiesUtil.get(DRIVER_KEY));
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static Connection open() {
-        try {
-            var resourceUrl = ConnectionManager.class.getClassLoader().getResource("CurrencyExchange.db");
-            if (resourceUrl == null) {
-                throw new RuntimeException("Database file not found in classpath.");
-            }
-            return DriverManager.getConnection("jdbc:sqlite:" + resourceUrl.getPath());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
     public static Connection get() {
         try {
             return pool.take();
         } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void closePool()  {
+        for (var connection : sourceConnections) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    private static void loadDriver() {
+        try {
+            Class.forName(PropertiesUtil.get(DRIVER_KEY));
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -68,14 +65,16 @@ public class ConnectionManager {
         }
 
     }
-    public static void closePool()  {
-        for (var connection : sourceConnections) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
 
-                throw new RuntimeException(e);
+    private static Connection open() {
+        try {
+            var resourceUrl = ConnectionManager.class.getClassLoader().getResource("CurrencyExchange.db");
+            if (resourceUrl == null) {
+                throw new RuntimeException("Database file not found in classpath.");
             }
+            return DriverManager.getConnection("jdbc:sqlite:" + resourceUrl.getPath());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

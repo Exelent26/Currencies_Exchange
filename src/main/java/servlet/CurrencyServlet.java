@@ -3,7 +3,6 @@ package servlet;
 import com.google.gson.Gson;
 import dto.CurrencyDto;
 import exception.ServiceException;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +18,7 @@ public class CurrencyServlet extends HttpServlet {
     Gson gson = new Gson();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
 
             String path = req.getPathInfo();

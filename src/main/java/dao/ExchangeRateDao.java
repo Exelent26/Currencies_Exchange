@@ -1,6 +1,5 @@
 package dao;
 
-import dao.CrudDao;
 import entity.Currency;
 import entity.ExchangeRate;
 import exception.DaoException;
@@ -162,7 +161,7 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
                     prepareStatement.setBigDecimal(3, rate);
                     prepareStatement.executeUpdate();
 
-                    try (var generatedKeys = prepareStatement.getGeneratedKeys();) {
+                    try (var generatedKeys = prepareStatement.getGeneratedKeys()) {
                         if (generatedKeys.next()) {
                             int id = generatedKeys.getInt(1);
                             connection.commit();

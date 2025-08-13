@@ -15,8 +15,6 @@ import util.RequestBodyParser;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,12 +25,12 @@ public class ExchangeRateServlet extends HttpServlet {
     DataValidator dataValidator = DataValidator.getInstance();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // ОТРЕФАКТОРЕН
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+
         try {
 
             String path = request.getPathInfo();
-            if (dataValidator.isExchangeRatePathInvalid(path)) {
+            if (dataValidator.isExchangeRatePathIncorrect(path)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -72,57 +70,25 @@ public class ExchangeRateServlet extends HttpServlet {
         }
     }
 
-    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-
-            // ОТРЕФАКТОРЕН
             String path = request.getPathInfo();
-
-            if (dataValidator.isExchangeRatePathInvalid(path)) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
-
             String baseCurrencyCode = path.substring(1, 4);
             String targetCurrencyCode = path.substring(4, 7);
 
             String body = collectParameters(request);
-            HashMap<String, String> parametersPair = RequestBodyParser.parametersPairCreatorFromBody(body);
+            String rateString = RequestBodyParser.parametersPairCreatorFromBody(body).get("rate");
 
-            String rateString = parametersPair.get("rate");
+            ExchangeRate updated = exchangeRateService.updateExchangeRate(baseCurrencyCode, targetCurrencyCode, rateString);
 
-            if (dataValidator.isNullOrBlank(baseCurrencyCode, targetCurrencyCode, rateString)) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+            response.setStatus(HttpServletResponse.SC_OK);
+            try (PrintWriter out = response.getWriter()) {
+                out.write(gson.toJson(updated));
             }
 
-            BigDecimal rate = exchangeRateService.getRateFromString(rateString);
-            if(!dataValidator.isRatePositive(rate)) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
-
-            if (rate.floatValue() > 0) {
-                Optional<ExchangeRateDto> exchangeRateByCode = exchangeRateService.getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
-
-                if (exchangeRateByCode.isPresent()) {
-                    Integer CurrencyIDForRateUpdate = exchangeRateByCode.get().getId();
-                    ExchangeRate updatedExchangeRate = exchangeRateService.updateExchangeRate(CurrencyIDForRateUpdate, rate);
-                    response.setStatus(HttpServletResponse.SC_OK);
-
-                    try (PrintWriter printWriter = response.getWriter()) {
-                        printWriter.write(gson.toJson(updatedExchangeRate));
-                    }
-                } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                }
-
-
-            }
         } catch (ServiceException e) {
             response.setStatus(e.getHttpStatusCode());
         }
-
     }
 
     private static String collectParameters(HttpServletRequest request) throws IOException {

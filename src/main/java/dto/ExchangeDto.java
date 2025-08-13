@@ -10,18 +10,11 @@ public class ExchangeDto {
 
     private final Currency baseCurrency;
     private final Currency targetCurrency;
-    private BigDecimal rate;
+    private final BigDecimal rate;
     BigDecimal amount;
     BigDecimal convertedAmount;
 
-    public ExchangeDto(ExchangeRateDto exchangeRate, BigDecimal amount, BigDecimal convertedAmount) {
-        this.exchangeRate = exchangeRate;
-        this.baseCurrency = exchangeRate.getBaseCurrency();
-        this.targetCurrency = exchangeRate.getTargetCurrency();
-        this.rate = exchangeRate.getRate();
-        this.amount = amount;
-        this.convertedAmount = convertedAmount;
-    }
+
     public ExchangeDto(Currency baseCurrency, Currency targetCurrency, BigDecimal rate, BigDecimal amount, BigDecimal convertedAmount) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
@@ -30,24 +23,13 @@ public class ExchangeDto {
         this.convertedAmount = convertedAmount;
     }
 
-    public ExchangeRateDto getExchangeRate() {
-        return exchangeRate;
-    }
+
 
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public BigDecimal getConvertedAmount() {
-        return convertedAmount;
-    }
-    public Currency getBaseCurrency() {
-        return baseCurrency;
-    }
 
-    public Currency getTargetCurrency() {
-        return targetCurrency;
-    }
 
     public BigDecimal getRate() {
         return rate;

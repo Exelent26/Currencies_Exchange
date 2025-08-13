@@ -89,25 +89,25 @@ public class ExchangeService {
 
     private static ExchangeDto getExchangeViaUsdDirect(ExchangeRateDto exchangeRateFromBaseToUsd, ExchangeRateDto exchangeRateUsdToTarget, BigDecimal amount) {
 
-        BigDecimal baseToUsdRate = exchangeRateFromBaseToUsd.getRate();
+        BigDecimal baseToUsdRate = exchangeRateFromBaseToUsd.rate();
 
-        BigDecimal usdToTargetRate = exchangeRateUsdToTarget.getRate();
+        BigDecimal usdToTargetRate = exchangeRateUsdToTarget.rate();
 
         BigDecimal rateForExchange = baseToUsdRate.multiply(usdToTargetRate);
 
         BigDecimal calculatedAmount = (rateForExchange).multiply(amount);
 
-        return new ExchangeDto(exchangeRateFromBaseToUsd.getBaseCurrency(), exchangeRateUsdToTarget.getTargetCurrency(), rateForExchange, amount, calculatedAmount);
+        return new ExchangeDto(exchangeRateFromBaseToUsd.baseCurrency(), exchangeRateUsdToTarget.targetCurrency(), rateForExchange, amount, calculatedAmount);
     }
 
     private static ExchangeDto getExchangeViaUsdReverse(ExchangeRateDto usdToBase, ExchangeRateDto usdToTarget, BigDecimal amount) {
 
-        BigDecimal usdToBaseRate = usdToBase.getRate();
-        BigDecimal usdToTargetRate = usdToTarget.getRate();
+        BigDecimal usdToBaseRate = usdToBase.rate();
+        BigDecimal usdToTargetRate = usdToTarget.rate();
 
         BigDecimal rate = (BigDecimal.ONE.divide(usdToBaseRate, 2, RoundingMode.HALF_UP)).multiply(usdToTargetRate);
         BigDecimal convertedAmount = rate.multiply(amount);
-        return new ExchangeDto(usdToBase.getTargetCurrency(), usdToTarget.getTargetCurrency(), rate, amount, convertedAmount);
+        return new ExchangeDto(usdToBase.targetCurrency(), usdToTarget.targetCurrency(), rate, amount, convertedAmount);
 
 
     }

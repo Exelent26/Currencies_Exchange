@@ -37,7 +37,7 @@ public class CurrencyService {
 
     public Currency buildCurrency(String code, String fullName, String sign) {
 
-        return validator.validateCurrencyData(code.toUpperCase(), fullName, sign);
+        return validator.validateCurrencyData(code.toUpperCase().trim(), fullName.trim(), sign.trim() );
     }
 
     public Currency saveCurrency(Currency currency) {

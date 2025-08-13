@@ -30,18 +30,11 @@ public class ExchangeRateService {
     }
 
     public List<ExchangeRateDto> getExchangeRates() {
-        return exchangeRateDao.findAll().stream()
-                .map(exchangeRate -> new ExchangeRateDto(exchangeRate.getId(), exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency(), exchangeRate.getRate()))
-                .collect(Collectors.toList());
+        return exchangeRateDao.findAll().stream().map(exchangeRate -> new ExchangeRateDto(exchangeRate.getId(), exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency(), exchangeRate.getRate())).collect(Collectors.toList());
     }
 
     public Optional<ExchangeRateDto> getExchangeRateByCode(String baseCurrencyCode, String targetCurrencyCode) {
-        return exchangeRateDao.findRateByCode(baseCurrencyCode, targetCurrencyCode).stream().findFirst()
-                .map(gottenRate -> new ExchangeRateDto(
-                        gottenRate.getId(),
-                        gottenRate.getBaseCurrency(),
-                        gottenRate.getTargetCurrency(),
-                        gottenRate.getRate()));
+        return exchangeRateDao.findRateByCode(baseCurrencyCode, targetCurrencyCode).stream().findFirst().map(gottenRate -> new ExchangeRateDto(gottenRate.getId(), gottenRate.getBaseCurrency(), gottenRate.getTargetCurrency(), gottenRate.getRate()));
     }
 
     public ExchangeRate save(ExchangeRate exchangeRate) {
@@ -70,7 +63,7 @@ public class ExchangeRateService {
 
         BigDecimal rate = this.getRateFromString(rateString);
 
-        if(!dataValidator.isRatePositive(rate)) {
+        if (dataValidator.isNegativeOrZero(rate)) {
             throw new ServiceException("Rate is negative", ServiceException.ErrorCode.VALIDATION_ERROR);
         }
 
@@ -89,13 +82,12 @@ public class ExchangeRateService {
         Currency baseCurrency = CurrencyMapper.INSTANCE.toEntity(baseCurrencyDTO.get());
 
         Currency targetCurrency = CurrencyMapper.INSTANCE.toEntity(targetCurrencyDTO.get());
-        Optional<ExchangeRateDto> exchangeRateByCode = this
-                .getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
+        Optional<ExchangeRateDto> exchangeRateByCode = this.getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
 
         if (exchangeRateByCode.isPresent()) {
             throw new ServiceException("This exchange rate already exists", ServiceException.ErrorCode.DUPLICATE_ENTITY);
         }
-        ExchangeRate newExchangeRate= this.buildExchangeRate(baseCurrency, targetCurrency, rate);
+        ExchangeRate newExchangeRate = this.buildExchangeRate(baseCurrency, targetCurrency, rate);
 
         return this.save(newExchangeRate);
 
@@ -109,10 +101,38 @@ public class ExchangeRateService {
         }
     }
 
+    public ExchangeRate updateExchangeRate(String baseCurrencyCode, String targetCurrencyCode, String rateString) {
+
+        DataValidator dataValidator = DataValidator.getInstance();
+
+        if (dataValidator.isNullOrBlank(baseCurrencyCode, targetCurrencyCode, rateString)) {
+            throw new ServiceException("One or more parameters are incorrect",
+                    ServiceException.ErrorCode.VALIDATION_ERROR);
+        }
+
+        BigDecimal rate = this.getRateFromString(rateString);
+
+        if (dataValidator.isNegativeOrZero(rate)) {
+            throw new ServiceException("Rate is negative",
+                    ServiceException.ErrorCode.VALIDATION_ERROR);
+        }
+
+        Optional<ExchangeRateDto> exchangeRateByCode = this.getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
+
+        if (exchangeRateByCode.isEmpty()) {
+            throw new ServiceException("Exchange rate not found",
+                    ServiceException.ErrorCode.NOT_FOUND);
+        }
+
+        Integer currencyIdForRateUpdate = exchangeRateByCode.get().id();
+
+        return this.updateExchangeRate(currencyIdForRateUpdate, rate);
+    }
+
     public ExchangeRateDto createReverseExchangeRate(ExchangeRateDto exchangeRate) {
-        BigDecimal rate = exchangeRate.getRate();
+        BigDecimal rate = exchangeRate.rate();
         BigDecimal reverseRate = BigDecimal.ONE.divide(rate, 2, RoundingMode.HALF_UP);
-        return new ExchangeRateDto(exchangeRate.getId(), exchangeRate.getTargetCurrency(), exchangeRate.getBaseCurrency(), reverseRate);
+        return new ExchangeRateDto(exchangeRate.id(), exchangeRate.targetCurrency(), exchangeRate.baseCurrency(), reverseRate);
     }
 
     public BigDecimal getRateFromString(String rateString) {
@@ -123,16 +143,14 @@ public class ExchangeRateService {
         }
     }
 
-
     protected ExchangeDto getExchangeDto(BigDecimal amount, ExchangeRateDto neededExchangeRate) {
 
-        BigDecimal rate = neededExchangeRate.getRate();
+        BigDecimal rate = neededExchangeRate.rate();
         BigDecimal convertedAmount = rate.multiply(amount);
         try {
 
-            return new ExchangeDto(neededExchangeRate.getBaseCurrency(),
-                    neededExchangeRate.getTargetCurrency(),neededExchangeRate.getRate(), amount, convertedAmount);
-        }catch (ServiceException e) {
+            return new ExchangeDto(neededExchangeRate.baseCurrency(), neededExchangeRate.targetCurrency(), neededExchangeRate.rate(), amount, convertedAmount);
+        } catch (ServiceException e) {
             throw new ServiceException("Can't convert rate", e, ServiceException.ErrorCode.VALIDATION_ERROR);
         }
     }

@@ -41,12 +41,6 @@ public class Currency {
         return fullName;
     }
 
-    public void setFullName(String fullName) {
-        if(fullName == null || fullName.length() > 50) {
-            throw new IllegalArgumentException("Full name must be at least 50 characters and cant be null");
-        }
-        this.fullName = fullName;
-    }
 
     public String getSign() {
         return sign;
