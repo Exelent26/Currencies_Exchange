@@ -96,6 +96,18 @@ public class CurrencyDao implements CrudDao<Currency> {
             throw new DaoException("Database error", DaoException.ErrorCode.DATABASE_ERROR);
         }
     }
+    public Optional<Currency> findByCode(String code, Connection connection) {
+        try (var prepareStatement = connection.prepareStatement(GET_CURRENCY_BY_CODE)) {
+            prepareStatement.setString(1, code);
+            var resultSet = prepareStatement.executeQuery();
+            return resultSet.next()
+                    ? Optional.of(buildCurrency(resultSet))
+                    : Optional.empty();
+
+        } catch (SQLException e) {
+            throw new DaoException("Database error", DaoException.ErrorCode.DATABASE_ERROR);
+        }
+    }
 
     @Override
     public List<Currency> findAll() {

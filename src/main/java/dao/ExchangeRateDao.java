@@ -120,8 +120,6 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
         var prepareStatement = connection.prepareStatement(UPDATE_EXCHANGE_RATE)) {
             prepareStatement.setBigDecimal(1, newRate);
             prepareStatement.setInt(2, exchangeRateId);
-            prepareStatement.executeUpdate();
-
             int updatedRows = prepareStatement.executeUpdate();
             if (updatedRows == 0) {
                 throw new DaoException("Exchange rate not found", DaoException.ErrorCode.EXCHANGE_RATE_NOT_FOUND);
@@ -145,13 +143,13 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
                  var prepareStatement = connection.prepareStatement(SAVE_EXCHANGE_RATE, Statement.RETURN_GENERATED_KEYS)) {
 
                 try {
-                    connection.setAutoCommit(false);
+
                     CurrencyDao currencyDao = CurrencyDao.getInstance();
-                    Currency base = currencyDao.findByCode(baseCode).orElseThrow(() -> new DaoException(
+                    Currency base = currencyDao.findByCode(baseCode, connection).orElseThrow(() -> new DaoException(
                             "Base currency not found: " + baseCode,
                             DaoException.ErrorCode.CURRENCY_NOT_FOUND
                     ));
-                    Currency target = currencyDao.findByCode(targetCode).orElseThrow(() -> new DaoException(
+                    Currency target = currencyDao.findByCode(targetCode, connection).orElseThrow(() -> new DaoException(
                             "Target currency not found: " + targetCode,
                             DaoException.ErrorCode.CURRENCY_NOT_FOUND
                     ));
@@ -164,7 +162,6 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
                     try (var generatedKeys = prepareStatement.getGeneratedKeys()) {
                         if (generatedKeys.next()) {
                             int id = generatedKeys.getInt(1);
-                            connection.commit();
                             return new ExchangeRate(id, base, target, rate);
 
                         } else {
@@ -172,7 +169,7 @@ public class ExchangeRateDao implements CrudDao<ExchangeRate> {
                         }
                     }
                 } catch (SQLException e) {
-                    connection.rollback();
+
                     throw new DaoException("Transaction failed", DaoException.ErrorCode.DATABASE_ERROR, e);
                 }
             } catch (SQLException e) {

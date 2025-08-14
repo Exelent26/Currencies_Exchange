@@ -1,6 +1,6 @@
 $(document).ready(function() {
     const host = "http://31.40.61.92:8080"
-
+    //const host = "http://127.0.0.1:1337"
 
 
     // Fetch the list of currencies and populate the select element

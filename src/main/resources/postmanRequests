@@ -37,7 +37,7 @@ PATCH
 
 GET
 /exchange?from=BASE_CURRENCY_CODE&to=TARGET_CURRENCY_CODE&amount=$AMOUNT
-
+/exchange?from=USD&to=GBP&amount=22
 через url передаются коды базовой(из которой переводят) и целевой валюты(в которую переводят) и
 количество необходимое для перевода
 

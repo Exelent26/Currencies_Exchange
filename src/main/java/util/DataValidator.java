@@ -16,7 +16,7 @@ public class DataValidator {
     }
 
     public Currency validateCurrencyData(String currencyCode, String name, String sign) {
-        validateCurrencyCode(currencyCode.trim());
+        currencyCode = validateCurrencyCode(currencyCode);
 
         name = validateCurrencyName(name);
 
@@ -29,10 +29,12 @@ public class DataValidator {
         return rate.compareTo(BigDecimal.ZERO) <= 0;
     }
 
-    public static void validateCurrencyCode(String... currencyCodes) {
-        for (String currencyCode : currencyCodes) {
+    public static String validateCurrencyCode(String currencyCode) {
+
+            currencyCode = currencyCode.trim();
+
             if (currencyCode.length() != 3) {
-                throw new ServiceException("INVALID CODE", ServiceException.ErrorCode.VALIDATION_ERROR);
+                throw new ServiceException("Currency code is must be 3 letters", ServiceException.ErrorCode.VALIDATION_ERROR);
             }
             if (currencyCode.isBlank()) {
                 throw new ServiceException("Currency code is blank", ServiceException.ErrorCode.VALIDATION_ERROR);
@@ -46,7 +48,8 @@ public class DataValidator {
             } catch (IllegalArgumentException e) {
                 throw new ServiceException("Currency code is not valid", ServiceException.ErrorCode.VALIDATION_ERROR);
             }
-        }
+
+        return currencyCode;
     }
 
     public boolean isAmountValid(String amountString) {
@@ -65,7 +68,7 @@ public class DataValidator {
     }
 
     private static String validateCurrencySign(String sign) {
-        if (sign.length() > 32) {
+        if (sign.length() > 3) {
             throw new ServiceException("SIGN TOO LONG", ServiceException.ErrorCode.VALIDATION_ERROR);
         }
         return sign.trim();
@@ -80,6 +83,9 @@ public class DataValidator {
         }
         if(Character.isDigit(name.charAt(0))) {
             throw new ServiceException("Name starts from digit", ServiceException.ErrorCode.VALIDATION_ERROR);
+        }
+        if (!name.matches("[a-zA-Zа-яА-ЯёЁ\\s]+")) {
+            throw new ServiceException("Name must contain only Russian or English letters", ServiceException.ErrorCode.VALIDATION_ERROR);
         }
 
         return name;

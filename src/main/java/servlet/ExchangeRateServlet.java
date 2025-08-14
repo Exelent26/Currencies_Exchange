@@ -9,6 +9,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import service.ExchangeRateService;
 import util.DataValidator;
 import util.RequestBodyParser;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
+    private static final Logger log = LoggerFactory.getLogger(ExchangeRateServlet.class);
     private final ExchangeRateService exchangeRateService = ExchangeRateService.getInstance();
     Gson gson = new Gson();
     DataValidator dataValidator = DataValidator.getInstance();
@@ -56,6 +60,7 @@ public class ExchangeRateServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
+            log.error("Непредвиденная ошибка в классе курсов в гет методе обмена валют", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
@@ -71,12 +76,15 @@ public class ExchangeRateServlet extends HttpServlet {
     }
 
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String baseCurrencyCode = null;
+        String targetCurrencyCode = null;
+        String body = null;
         try {
             String path = request.getPathInfo();
-            String baseCurrencyCode = path.substring(1, 4);
-            String targetCurrencyCode = path.substring(4, 7);
+            baseCurrencyCode = path.substring(1, 4);
+            targetCurrencyCode = path.substring(4, 7);
 
-            String body = collectParameters(request);
+            body = collectParameters(request);
             String rateString = RequestBodyParser.parametersPairCreatorFromBody(body).get("rate");
 
             ExchangeRate updated = exchangeRateService.updateExchangeRate(baseCurrencyCode, targetCurrencyCode, rateString);
@@ -87,7 +95,12 @@ public class ExchangeRateServlet extends HttpServlet {
             }
 
         } catch (ServiceException e) {
+            log.error("ServiceException PATCH base={} target={} body={} rid={}",
+                    baseCurrencyCode, targetCurrencyCode, body, MDC.get("rid"), e);
             response.setStatus(e.getHttpStatusCode());
+        }catch (Exception e) {
+            log.error("Непредвиденная ошибка в классе курсов в патч методе обмена валют", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

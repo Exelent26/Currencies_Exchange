@@ -9,6 +9,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.ExchangeRateService;
 
 import java.io.IOException;
@@ -19,9 +21,11 @@ import java.util.Optional;
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService = ExchangeRateService.getInstance();
+    private static final Logger log = LoggerFactory.getLogger(ExchangeRatesServlet.class);
     Gson gson = new Gson();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)  {
+
         try {
             var exchangeRates = exchangeRateService.getExchangeRates();
 
@@ -38,7 +42,9 @@ public class ExchangeRatesServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
+            log.error("Непредвиденная ошибка", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
         }
     }
 
@@ -63,7 +69,11 @@ public class ExchangeRatesServlet extends HttpServlet {
                 writer.write(gson.toJson(exchangeRate));
             }
         } catch (ServiceException e) {
+            log.error("Ошибка в процессе получения обменных курсов");
             response.setStatus(e.getHttpStatusCode());
+        }catch (Exception e) {
+            log.error("Непредвиденная ошибка", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }

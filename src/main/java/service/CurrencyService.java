@@ -71,7 +71,7 @@ public class CurrencyService {
 
         String code = path.substring(1);
 
-        DataValidator.validateCurrencyCode(code);
+        code  = DataValidator.validateCurrencyCode(code);
 
         Optional<CurrencyDto> currencyByCode = this.getCurrencyByCode(code);
         if (currencyByCode.isEmpty()) {

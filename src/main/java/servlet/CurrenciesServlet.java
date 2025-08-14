@@ -8,6 +8,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.CurrencyService;
 
 import java.io.IOException;
@@ -20,10 +22,12 @@ import java.util.Map;
 public class CurrenciesServlet extends HttpServlet {
     private final CurrencyService currencyService = CurrencyService.getInstance();
     Gson gson = new Gson();
+    private static final Logger log = LoggerFactory.getLogger(CurrenciesServlet.class);
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
+        log.error("=== TEST LOG ===");
 
         try {
             List<CurrencyDto> currencies = currencyService.getCurrencies();
@@ -37,10 +41,12 @@ public class CurrenciesServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 
             }
-        } catch (Exception ex) {
+        } catch (Exception e) {
 
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write(gson.toJson(Map.of("error", "Something went wrong")));
+            log.error("Непредвиденная ошибка в классе процесса получения списка валют", e);
+
         }
     }
 
@@ -61,6 +67,9 @@ public class CurrenciesServlet extends HttpServlet {
 
         } catch (ServiceException e) {
             resp.setStatus(e.getHttpStatusCode());
+        }catch (Exception e) {
+            log.error("Непредвиденная ошибка в классе процессе добавления валюты", e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
     }

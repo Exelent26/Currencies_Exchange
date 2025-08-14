@@ -7,6 +7,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.ExchangeService;
 
 import java.io.IOException;
@@ -14,6 +16,8 @@ import java.io.PrintWriter;
 
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
+    private static final Logger log = LoggerFactory.getLogger(ExchangeServlet.class);
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -33,11 +37,15 @@ public class ExchangeServlet extends HttpServlet {
                 writer.write(json);
             }
         } catch (ServiceException e) {
+            log.error("Ошибка в процессе обмена валют: from={}, to={}, amount={}", from, to, amountString, e);
             response.setStatus(e.getHttpStatusCode());
             try (PrintWriter writer = response.getWriter()) {
                 writer.write(e.getMessage());
             }
 
+        }catch (Exception e) {
+            log.error("Непредвиденная ошибка в классе процесса обмена валют", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
     }

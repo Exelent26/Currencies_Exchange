@@ -62,6 +62,7 @@ public class ExchangeRateService {
         }
 
         BigDecimal rate = this.getRateFromString(rateString);
+        rate = rate.setScale(2, RoundingMode.HALF_UP);
 
         if (dataValidator.isNegativeOrZero(rate)) {
             throw new ServiceException("Rate is negative", ServiceException.ErrorCode.VALIDATION_ERROR);
@@ -95,7 +96,7 @@ public class ExchangeRateService {
 
     public ExchangeRate updateExchangeRate(Integer exchangeRateId, BigDecimal rate) {
         try {
-            return exchangeRateDao.updateExchangeRate(exchangeRateId, rate);
+            return exchangeRateDao.updateExchangeRate(exchangeRateId, rate.setScale(2, RoundingMode.HALF_UP));
         } catch (DaoException e) {
             throw new ServiceException("Can't update exchangeRate", e, ServiceException.ErrorCode.DAO_ERROR);
         }
@@ -111,6 +112,7 @@ public class ExchangeRateService {
         }
 
         BigDecimal rate = this.getRateFromString(rateString);
+        rate = rate.setScale(2, RoundingMode.HALF_UP);
 
         if (dataValidator.isNegativeOrZero(rate)) {
             throw new ServiceException("Rate is negative",
@@ -130,7 +132,7 @@ public class ExchangeRateService {
     }
 
     public ExchangeRateDto createReverseExchangeRate(ExchangeRateDto exchangeRate) {
-        BigDecimal rate = exchangeRate.rate();
+        BigDecimal rate = exchangeRate.rate().setScale(2, RoundingMode.HALF_UP);
         BigDecimal reverseRate = BigDecimal.ONE.divide(rate, 2, RoundingMode.HALF_UP);
         return new ExchangeRateDto(exchangeRate.id(), exchangeRate.targetCurrency(), exchangeRate.baseCurrency(), reverseRate);
     }
@@ -145,8 +147,9 @@ public class ExchangeRateService {
 
     protected ExchangeDto getExchangeDto(BigDecimal amount, ExchangeRateDto neededExchangeRate) {
 
-        BigDecimal rate = neededExchangeRate.rate();
+        BigDecimal rate = neededExchangeRate.rate().setScale(2, RoundingMode.HALF_UP);
         BigDecimal convertedAmount = rate.multiply(amount);
+        convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
         try {
 
             return new ExchangeDto(neededExchangeRate.baseCurrency(), neededExchangeRate.targetCurrency(), neededExchangeRate.rate(), amount, convertedAmount);
